@@ -1,15 +1,14 @@
 #!/usr/bin/env python
-import sys
 from setuptools import setup
 
 PACKAGE = 'timingandestimationplugin'
 
-setup(name=PACKAGE,
-      description='Plugin to make Trac support time estimation and tracking with permissions',
-      keywords='trac plugin estimation timetracking permissions',
+setup(name='EduTracTimingAndEstimation',
+      description='Plugin to make EduTrac support time estimation and tracking',
+      keywords='trac plugin estimation timetracking',
       version='1.2.7b',
       url='http://www.trac-hacks.org/wiki/TimingAndEstimationPlugin',
-      license='http://www.opensource.org/licenses/mit-license.php',
+      license='MIT',
       author='Russ Tyndall at Acceleration.net',
       author_email='russ@acceleration.net',
       long_description="""

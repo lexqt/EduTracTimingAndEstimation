@@ -1,25 +1,12 @@
-from trac.ticket import ITicketChangeListener, Ticket, ITicketManipulator
-from trac.perm import PermissionCache
-from trac.core import *
 import datetime
+
+from trac.core import *
+from trac.util.datefmt import to_utimestamp
+from trac.ticket import ITicketChangeListener
+from trac.perm import PermissionCache
+
 import dbhelper
 
-def identity(x):
-    return x;
-
-def convertfloat(x):
-    "some european countries use , as the decimal separator"
-    x = str(x).strip()
-    if len(x) > 0:
-        return float(x.replace(',','.'))
-    else: 
-        return 0.0
-
-try:
-    import trac.util.datefmt
-    to_timestamp = trac.util.datefmt.to_utimestamp
-except Exception:
-    to_timestamp = identity
 
 
 def save_custom_field_value( db, ticket_id, field, value ):
@@ -43,7 +30,7 @@ def save_ticket_change( db, ticket_id, author, change_time, field, oldvalue, new
        dontinsert means do not add the change if it didnt already exist 
     """
     if type(change_time) == datetime.datetime:
-        change_time = to_timestamp(change_time)
+        change_time = to_utimestamp(change_time)
     cursor = db.cursor();
     sql = """SELECT * FROM ticket_change  
              WHERE ticket=%s and author=%s and time=%s and field=%s""" 
@@ -90,16 +77,13 @@ class TimeTrackingTicketObserver(Component):
                     return tipe(val[2] or default)
                 return default
 
-        hours = readTicketValue("hours", convertfloat)
-        totalHours = readTicketValue("totalhours", convertfloat)
+        hours = ticket['hours'] or 0.0
+        totalHours = ticket['totalhours'] or 0.0
 
         ticket_id = ticket.id
         cl = ticket.get_changelog()
         
         self.log.debug("found hours: "+str(hours ));
-        #self.log.debug("Dir_ticket:"+str(dir(ticket)))
-        #self.log.debug("ticket.values:"+str(ticket.values))
-        #self.log.debug("changelog:"+str(cl))
     
         most_recent_change = None
         if cl:
@@ -129,7 +113,7 @@ class TimeTrackingTicketObserver(Component):
         @self.env.with_transaction()
         def fn(db):
             ## SAVE estimated hour
-            estimatedhours = readTicketValue("estimatedhours", convertfloat)        
+            estimatedhours = ticket['estimatedhours'] or 0.0
             self.log.debug("found Estimated hours:"+str(estimatedhours))
             save_ticket_change( db, ticket_id, author, change_time,
                                 "estimatedhours", DONTUPDATE, str(estimatedhours),
@@ -167,32 +151,3 @@ class TimeTrackingTicketObserver(Component):
     def ticket_deleted(self, ticket):
         """Called when a ticket is deleted."""
 
-class TimeTrackingTicketValidator(Component):
-    implements(ITicketManipulator)
-
-    def __init__(self):
-        pass
-
-    def prepare_ticket(req, ticket, fields, actions):
-        """not currently called"""
-
-    def validate_ticket(self, req, ticket):
-        """Validate a ticket after it's been populated from user input.
-
-        Must return a list of `(field, message)` tuples, one for each problem
-        detected. `field` can be `None` to indicate an overall problem with the
-        ticket. Therefore, a return value of `[]` means everything is OK."""
-        errors = []
-        try:
-            convertfloat(ticket.values['hours'])
-        except KeyError:
-            self.log.exception("The hours field was not submitted")
-        except ValueError:
-            errors.append(('Add Hours to Ticket', 'Value must be a number'))
-        try:
-            convertfloat(ticket.values['estimatedhours'])
-        except KeyError:
-            self.log.exception("The estimatedhours field was not submitted")
-        except ValueError:
-            errors.append(('Estimated Number of Hours', 'Value must be a number'))
-        return errors

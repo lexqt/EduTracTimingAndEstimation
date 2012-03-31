@@ -112,6 +112,9 @@
 	       b = b.nextSibling;
 	       if (b.nodeName == 'TD')
 	       {
+	       		if (b.children && b.children[0].nodeName == 'A') {
+	       			b = b.children[0]
+	       		}
 		  b.innerHTML = FloatToHoursMins(b.innerHTML);
 		  break;
 	       }
