@@ -48,9 +48,6 @@ class TimeTrackingSetupParticipant(Component):
 
     def environment_created(self):
         """Called when a new Trac environment is created."""
-        if self.environment_needs_upgrade(None):
-            self.upgrade_environment(None)
-
 
     def system_needs_upgrade(self):
         return self.db_installed_version < self.db_version
@@ -114,7 +111,7 @@ class TimeTrackingSetupParticipant(Component):
         when = int(time.time())
         sql = """
         INSERT INTO wiki (name,version,time,author,ipnr,text,comment,readonly)
-        VALUES ( %s, %s, %s, 'Timing and Estimation Plugin', '127.0.0.1', %s,'',0)
+        VALUES ( %s, %s, %s, 'trac', '127.0.0.1', %s,'',0)
         """
         dbhelper.execute_non_query(self.env, sql,
                                    user_manual_wiki_title,
