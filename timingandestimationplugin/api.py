@@ -5,7 +5,6 @@ import time
 from trac.core import *
 from trac.env import IEnvironmentSetupParticipant
 
-from tande_filters import *
 from ticket_daemon import *
 from usermanual import *
 from webui import *
@@ -16,18 +15,26 @@ class TimeTrackingSetupParticipant(Component):
     """ This is the config that must be there for this plugin to work:
 
         [ticket-custom]
-        totalhours = text
+        totalhours = float
         totalhours.value = 0
         totalhours.label = Total Hours
 
-        hours = text
+        hours = float
+        hours.hide_view = true
         hours.value = 0
         hours.label = Hours to Add
 
-        estimatedhours = text
+        estimatedhours = float
+        estimatedhours.label = Estimated Hours
         estimatedhours.value = 0
-        estimatedhours.label = Estimated Hours?
 
+        And something like this for filters:
+
+        [ticket-fields-filters]
+        fields = totalhours, hours, estimatedhours
+        totalhours.disable = true
+        estimatedhours.permission = TIME_RECORD:disable
+        hours.permission = TIME_VIEW:remove, TIME_RECORD:disable
         """
     implements(IEnvironmentSetupParticipant)
     db_version_key = None
@@ -79,22 +86,23 @@ class TimeTrackingSetupParticipant(Component):
         ticket_custom = "ticket-custom"
 
         if not self.config.get(ticket_custom,"totalhours"):
-            self.config.set(ticket_custom,"totalhours", "text")
+            self.config.set(ticket_custom,"totalhours", "float")
             self.config.set(ticket_custom,"totalhours.order", "4")
             self.config.set(ticket_custom,"totalhours.value", "0")
             self.config.set(ticket_custom,"totalhours.label", "Total Hours")
 
         if not self.config.get(ticket_custom,"hours"):
-            self.config.set(ticket_custom,"hours", "text")
+            self.config.set(ticket_custom,"hours", "float")
+            self.config.set(ticket_custom,"hours.hide_view", "true")
             self.config.set(ticket_custom,"hours.value", "0")
             self.config.set(ticket_custom,"hours.order", "2")
             self.config.set(ticket_custom,"hours.label", "Add Hours to Ticket")
 
         if not self.config.get(ticket_custom,"estimatedhours"):
-            self.config.set(ticket_custom,"estimatedhours", "text")
+            self.config.set(ticket_custom,"estimatedhours", "float")
             self.config.set(ticket_custom,"estimatedhours.value", "0")
             self.config.set(ticket_custom,"estimatedhours.order", "1")
-            self.config.set(ticket_custom,"estimatedhours.label", "Estimated Number of Hours")
+            self.config.set(ticket_custom,"estimatedhours.label", "Estimated Hours")
 
         self.config.save();
 

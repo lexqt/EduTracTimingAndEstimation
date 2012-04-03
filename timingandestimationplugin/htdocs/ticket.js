@@ -44,60 +44,8 @@
       return str;
    }
    
-   function IntToYesNo(boolflag)
-   {
-      if (boolflag == '1')
-	 return 'Yes';
-      
-      if (boolflag == '0')
-	 return 'No';
-      
-      return boolflag;
-   }
-   
-   
    InitBilling = function(){
-      /*  // Convert totalhours field to non-editable
-      try
-      {
-	 var x = document.getElementById('totalhours');
-	 x = x || document.getElementById('field-totalhours');
-	 if (x)
-	 {
-	    var p = x.parentNode;
-	    var n = document.createElement('span')
-	       n.id = x.id;
-	    n.appendChild(document.createTextNode(x.value));
-	    p.removeChild(x);
-	    p.appendChild(n);
-	 }
-      }
-      catch (er) {}
-      */
 
-      // Display yes/no in the summary
-      // if we fail, then no harm done.
-      try
-      {
-	 var b = document.getElementById('h_billable');
-	 do{ b = b.nextSibling; }while(b.nodeName != "TD");
-	 b.innerHTML = IntToYesNo(b.innerHTML);
-      }
-      catch (er) {}
-  
-      /*
-      // Hide the Add Hours in the title table
-      // if we fail, then no harm done.
-      try
-      {
-	 var b = document.getElementById('h_hours');
-	 b.innerHTML = '';
-	 do{ b = b.nextSibling; }while(b.nodeName != "TD");
-	 b.innerHTML = '';
-      }
-      catch (er) {}
-      */
-      
       // Convert hours from float to hours minutes seconds
       // if we fail, then no harm done.
       try
