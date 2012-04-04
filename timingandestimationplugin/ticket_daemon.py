@@ -77,8 +77,8 @@ class TimeTrackingTicketObserver(Component):
                     return tipe(val[2] or default)
                 return default
 
-        hours = ticket['hours'] or 0.0
-        totalHours = ticket['totalhours'] or 0.0
+        hours = float(ticket['hours'] or 0.0)
+        totalHours = float(ticket['totalhours'] or 0.0)
 
         ticket_id = ticket.id
         cl = ticket.get_changelog()
@@ -137,8 +137,8 @@ class TimeTrackingTicketObserver(Component):
 
     def ticket_created(self, ticket):
         """Called when a ticket is created."""
+        ticket['hours'] = None
         self.watch_hours(ticket)
-                               
 
     def ticket_changed(self, ticket, comment, author, old_values):
         """Called when a ticket is modified.
