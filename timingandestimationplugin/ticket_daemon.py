@@ -65,7 +65,7 @@ class TimeTrackingTicketObserver(Component):
     def __init__(self):
         pass
 
-    def watch_hours(self, ticket):
+    def watch_hours(self, ticket, is_new=False):
         def readTicketValue(name, tipe, default=0):
             if ticket.values.has_key(name):        
                 return tipe(ticket.values[name] or default)
@@ -77,7 +77,7 @@ class TimeTrackingTicketObserver(Component):
                     return tipe(val[2] or default)
                 return default
 
-        hours = float(ticket['hours'] or 0.0)
+        hours = 0.0 if is_new else float(ticket['hours'] or 0.0)
         totalHours = float(ticket['totalhours'] or 0.0)
 
         ticket_id = ticket.id
@@ -121,6 +121,8 @@ class TimeTrackingTicketObserver(Component):
             save_custom_field_value( db, ticket.id, "estimatedhours", str(estimatedhours))
             #######################
 
+            if is_new:
+                save_custom_field_value( db, ticket_id, "hours", '0')
 
             ## If our hours changed 
             if not hours == 0:                
@@ -137,8 +139,7 @@ class TimeTrackingTicketObserver(Component):
 
     def ticket_created(self, ticket):
         """Called when a ticket is created."""
-        ticket['hours'] = None
-        self.watch_hours(ticket)
+        self.watch_hours(ticket, is_new=True)
 
     def ticket_changed(self, ticket, comment, author, old_values):
         """Called when a ticket is modified.
