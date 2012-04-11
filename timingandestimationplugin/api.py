@@ -21,6 +21,7 @@ class TimeTrackingSetupParticipant(Component):
 
         hours = float
         hours.hide_view = true
+        hours.virtual = true
         hours.value = 0
         hours.label = Hours to Add
 
@@ -94,6 +95,7 @@ class TimeTrackingSetupParticipant(Component):
         if not self.config.get(ticket_custom,"hours"):
             self.config.set(ticket_custom,"hours", "float")
             self.config.set(ticket_custom,"hours.hide_view", "true")
+            self.config.set(ticket_custom,"hours.virtual", "true")
             self.config.set(ticket_custom,"hours.value", "0")
             self.config.set(ticket_custom,"hours.order", "2")
             self.config.set(ticket_custom,"hours.label", "Add Hours to Ticket")

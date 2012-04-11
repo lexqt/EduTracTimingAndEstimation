@@ -13,21 +13,12 @@ class TimeTrackingTicketObserver(Component):
             return
 
         hours = ticket['hours'] or 0.0
-        totalhours = ticket['totalhours'] or 0.0
 
         if hours:
+            totalhours = ticket['totalhours'] or 0.0
             newtotal = totalhours + hours
             newtotal = max(0.0, newtotal)
             ticket['totalhours'] = newtotal
-
-        # reset hours field value to null
-        @self.env.with_transaction()
-        def fn(db):
-            cursor = db.cursor()
-            cursor.execute('''
-                UPDATE ticket_custom SET value=%s
-                WHERE ticket=%s AND name=%s
-                ''', (None, ticket.id, 'hours'))
 
     # ITicketManipulator
 
@@ -35,7 +26,8 @@ class TimeTrackingTicketObserver(Component):
         pass
 
     def validate_ticket(self, req, ticket, action):
-        if not ticket.exists and ticket['hours'] != 0:
+        hours = ticket['hours'] or 0
+        if not ticket.exists and hours != 0:
             yield ('hours', 'Can not add hours to new ticket')
         if ticket['estimatedhours'] < 0:
             yield ('estimatedhours', 'Value can not be negative')
